@@ -12,7 +12,7 @@ while temperatur < 120:
      now = time.localtime()
      print("Datum:",now.tm_mday,".",now.tm_mon,".",now.tm_year,"  Zeit:",now.tm_hour,":", now.tm_min,":", now.tm_sec)
      print ( " es wird gemessen " )
-     time.sleep(60)
+     time.sleep(300)
      print("Temperatur = " + str(temperatur)+" C ,    Feuchtigkeit = " + str( feuchtigkeit)+" %",)
      f_in = open('/media/pi/Scandisk/PI/DHT_11/text.txt')
      f_out = open('/media/pi/Scandisk/PI/DHT_11/text.txt', 'a')
