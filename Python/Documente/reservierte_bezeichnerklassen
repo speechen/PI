@@ -1,0 +1,30 @@
+2.3.2. Reservierte Bezeichnerklassen ¶
+Bestimmte Klassen von Bezeichnern (neben Schlüsselwörtern) haben spezielle 
+Bedeutungen. Diese Klassen werden durch die Muster der führenden und 
+nachfolgenden Unterstriche gekennzeichnet:
+
+_*
+Nicht importiert von . Die spezielle Kennung wird im interaktiven Interpreter 
+verwendet, um das Ergebnis der letzten Auswertung zu speichern. es ist im Modul 
+gespeichert . Wenn nicht im interaktiven Modus, hat keine besondere Bedeutung 
+und ist nicht definiert. Siehe Abschnitt Die import-Anweisung .
+from module import *_builtins_
+
+Hinweis Der Name _wird häufig im Zusammenhang mit der Internationalisierung 
+verwendet. gettextWeitere Informationen zu dieser Konvention finden Sie 
+in der Dokumentation des Moduls.
+__*__
+Systemdefinierte Namen. Diese Namen werden vom Interpreter und seiner 
+Implementierung (einschließlich der Standardbibliothek) definiert. 
+Aktuelle Systemnamen werden im Abschnitt Spezielle Methodennamen und 
+an anderer Stelle erläutert . Weitere werden wahrscheinlich in zukünftigen 
+Versionen von Python definiert. Jede Verwendung von __*__Namen, in irgendeinem 
+Zusammenhang, die nicht ausdrücklich dokumentiert ist, kann ohne Vorwarnung 
+zum Bruch führen.
+
+__*
+Private Klassennamen. Namen in dieser Kategorie werden, wenn sie im
+Kontext einer Klassendefinition verwendet werden, so umgeschrieben, 
+dass sie ein unlesbares Formular verwenden, um Namenskonflikte zwischen 
+„privaten“ Attributen von Basisklassen und abgeleiteten Klassen zu vermeiden. 
+Siehe Abschnitt Bezeichner (Namen) .

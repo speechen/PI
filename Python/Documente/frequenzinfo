@@ -1,0 +1,16 @@
+sudo apt-get install cpufrequtils
+cpufreq-info
+ev. hier auslesen
+sys/devices/system/cpu/cpu*/cpufreq/scaling_governor)
+
+oder hier auslesen
+
+sudo cat /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq
+
+ dateilesen.close()
+ tempFreq = "/sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq"
+ dateilesen = open(tempFreq, "r")
+ frequenz = dateilesen.readline(3)
+ dateilesen.close()
+ 
+ Permission denied wie umgehen

@@ -1,0 +1,19 @@
+#!/usr/bin/env python3.3
+
+$ chmod +x myscript.py
+
+# -*- coding: Kodierung -*-
+
+Mit dieser Angabe wird alles in der Quelltextdatei so behandelt, als hätte es die Kodierung Kodierung an Stelle von UTF-8.
+Die Liste der möglichen Kodierungen findet man in der Python Library Reference, in der Sektion zu codecs.
+
+# -*- coding: cp-1252 -*-
+
+alle Zeichen des Windows-1252 Zeichensatzes im Quelltext verwenden.
+
+Kodierungskommentar muss in der ersten oder zweiten Zeile der Datei stehen.
+
+Die Standardbibliothek verwendet allerdings nur ASCII-Zeichen für Bezeichner - eine Konvention, der jeder portable Code folgen sollte.
+Um alle diese Zeichen korrekt darzustellen, muss ein Editor erkennen, dass die Datei UTF-8 kodiert ist und einen Font benutzen, der alle Zeichen der Datei unterstützt.
+
+Die normalen Vergleichsoperatoren werden wie in C geschrieben: < (kleiner als), > (größer als), == (gleich), <= (kleiner oder gleich), >= (größer oder gleich) und != (ungleich).
