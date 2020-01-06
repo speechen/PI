@@ -1,0 +1,471 @@
+WIE MAN FEINSTAUB MIT EINEM RASPBERRY PI MESSEN KANN [UPDATE]
+ 27. Februar 2018  Zefanja Kommentare  16 Kommentare
+Wir messen an unserer Schule regelmäßig den Feinstaubgehalt in der Luft. 
+Besonders zwischen Februar und Mai sind die Werte hier in Süd-Ost Asien 
+sehr hoch, da es in dieser Zeit kaum regnet, es sehr trocken und heiß ist 
+und viele Wiesen und Felder abgebrannt werden. Das alles wirkt sich negativ 
+auf die Qualität der Luft aus. Heute möchte ich zeigen, wie man den Feinstaub 
+mit einem Raspberry Pi messen kann. Doch vorher möchte ich kurz auf die Frage 
+eingehen: Was ist Feinstaub überhaupt und was wollen wir messen?
+
+Was ist Feinstaub?
+Ganz grob kann man sagen, dass es sich bei Feinstaub um sehr kleine Partikel /
+ Teilchen in der Luft handelt. Man unterscheidet dabei zwischen PM10 und PM2.5 
+ (Particulate Matter, auch Feststoffteilchen). Bei PM10 handelt es sich dabei 
+ um alle Partikel in der Luft, die kleiner als 10µm sind, bei PM2.5 entsprechend 
+ alle Teilchen, die kleiner als 2.5µm sind. Je kleiner die Teilchen, also v.a. 
+ alles kleiner als 2.5µm, desto gefährlicher sind sie für die Gesundheit, 
+ da sie bis in die Lungenbläschen eindringen können.
+
+Die WHO empfiehlt z.B. folgende Grenzwerte:
+
+Jahresmittel PM10 20 µg/m³
+Jahresmittel PM2,5 10 µg/m³
+Tagesmittel PM10 50 µg/m³ ohne zulässige Tage, an denen eine Überschreitung möglich ist.
+Tagesmittel PM2,5 25 µg/m³ ohne zulässige Tage, an denen eine Überschreitung möglich ist.
+Diese Werte liegen unter den in den meisten Ländern festgelegten Grenzen.
+ In EU ist ein Jahresmittel für PM10 von 40 µg/m³ zulässig.
+
+Was ist der Air Quality Index (AQI)?
+Ausgehend von dem Feinstaubgehalt in der Luft kann man den Air Quality 
+Index berechnen. Er gibt an, wie „gut“ oder „schlecht“ die Luft gerade ist. 
+Leider gibt es hier keinen einheitlichen Standard, da verschiedene Länder 
+diesen jeweils anders berechnen oder andere Skalen haben. Der Wikipedia-Artikel 
+zum Air Quality Index liefert dafür einen gute Übersicht. An unserer Schule 
+richten wir uns nach der Einteilung wie sie von der EPA (United States Environmental 
+Protection Agency) festgelegt wurde.
+
+AQI
+
+Soweit ein kurzer Abriss zum Thema Feinstaub und AQI.
+
+Was brauchen wir für die Feinstaubmessung?
+Eigentlich braucht es nur zwei Dinge:
+
+einen Raspberry Pi (jedes Modell geht, am besten ein Modell mit WLAN)
+Feinstaubsensor SDS011
+SDS011
+
+Das war es schon 🙂 Wer sich für einen Raspberry Pi Zero W entscheidet, 
+benötigt noch ein Adapterkabel auf einen Standard-USB Anschluss, 
+da der Zero nur Micro-USB hat. Den Sensor bekommt man am besten bei Aliexpress. 
+Dort kostet er um die 17-20$. Der Sensor hat eine USB-Adapter für die serielle Schnittstelle mit dabei.
+
+Installation
+Für unseren Raspberry Pi laden wir uns das entsprechende Raspbian Lite 
+Image herunter und schreiben es auf die Micro-SD Karte. Dokumentiert ist das z.B. hier. 
+Auf die Einrichtung der WLAN-Verbindung gehe ich an dieser Stelle nicht ein. 
+Dazu gibt es viele Tutorials im Netz.
+
+Wer nach dem Booten gleich SSH aktiviert haben möchte, muss in der 
+boot-Partition einen leere Datei mit dem Namen ssh anlegen. 
+Die IP des Raspberry Pis bekommt man am besten über den eigenen Router 
+/ DHCP Server heraus. Danach kann man sich per SSH anmelden (Standardpasswort ist raspberry):
+
+$ ssh pi@192.168.1.5
+1
+$ ssh pi@192.168.1.5
+Für unseren Sensor verwenden wir eine kleines Python-Modul, was uns einiges 
+an Arbeit abnimmt. Dazu müssen wir noch einige Pakete installieren und 
+das Repository auf den Pi klonen.
+
+$ sudo apt install python-serial python-enum lighttpd
+1
+$ sudo apt install python-serial python-enum lighttpd
+Alle benötigten Pakete sollten jetzt installiert sein und das Modul für 
+unseren Sensor befindet sich in /home/pi/sds011. Unter 
+/home/pi/sds011/Code/text.py gibt es ein Testprogramm, mit dem man den Sensor 
+testen kann. Bevor wir das Programm aufrufen können, müssen wir noch wissen,
+ an welchem seriellen Port der USB-Adapter steckt. dmesg hilft uns weiter:
+
+$ dmesg
+[ 5.559802] usbcore: registered new interface driver usbserial
+[ 5.559930] usbcore: registered new interface driver usbserial_generic
+[ 5.560049] usbserial: USB Serial support registered for generic
+[ 5.569938] usbcore: registered new interface driver ch341
+[ 5.570079] usbserial: USB Serial support registered for ch341-uart
+[ 5.570217] ch341 1-1.4:1.0: ch341-uart converter detected
+[ 5.575686] usb 1-1.4: ch341-uart converter now attached to ttyUSB0
+1
+2
+3
+4
+5
+6
+7
+8
+$ dmesg
+[ 5.559802] usbcore: registered new interface driver usbserial
+[ 5.559930] usbcore: registered new interface driver usbserial_generic
+[ 5.560049] usbserial: USB Serial support registered for generic
+[ 5.569938] usbcore: registered new interface driver ch341
+[ 5.570079] usbserial: USB Serial support registered for ch341-uart
+[ 5.570217] ch341 1-1.4:1.0: ch341-uart converter detected
+[ 5.575686] usb 1-1.4: ch341-uart converter now attached to ttyUSB0
+In der letzten Zeile steht unsere Schnittstelle: ttyUSB0. Wir brauchen 
+jetzt noch zwei Dinge: einmal ein kleines Python-Skript, welches die Daten 
+ausliest und in eine JSON-Datei speichert und dann werden wir eine kleine 
+HTML-Seite basteln, die diese Daten ausliest und darstellt.
+
+Daten auf dem Raspberry Pi auslesen [Update]
+Wir erstellen zuerst eine Instanz des Sensors und lesen dann alle 5 Minuten
+ für 30 Sekunden den Sensor aus. Diese Werte können natürlich angepasst werden
+ . Zwischen den Messintervallen versetzen wir den Sensor in einen Schlafmodus,
+  um die Lebensdauer zu erhöhen (Lebensdauer beträgt laut Hersteller ca. 8000 Stunden).
+
+[Update, 27.02.2018] Ich habe festgestellt, das meine Python3 Version des Skripts
+ die serielle Schnittstellen nicht ansprechen konnte, z.B. nach einem Reboot. 
+ Erst nach mehrmaligem Starten des Skripts konnten dann die Daten gelesen werden. 
+ Woran das liegt, habe ich leider nicht herausgefunden, aber mit Python2.7 funktioniert es ohne Probleme. 
+ Deshalb hier eine neue Version des Skripts, welche auf Python2.7 basiert.
+
+Im Homeverzeichnis legen wir eine Datei mit dem Namen aqi.py an und 
+kopieren den folgenden Inhalt hinein:
+
+#!/usr/bin/python
+# coding=utf-8
+# "DATASHEET": http://cl.ly/ekot
+# https://gist.github.com/kadamski/92653913a53baf9dd1a8
+from __future__ import print_function
+import serial, struct, sys, time, json
+
+DEBUG = 0
+CMD_MODE = 2
+CMD_QUERY_DATA = 4
+CMD_DEVICE_ID = 5
+CMD_SLEEP = 6
+CMD_FIRMWARE = 7
+CMD_WORKING_PERIOD = 8
+MODE_ACTIVE = 0
+MODE_QUERY = 1
+
+ser = serial.Serial()
+ser.port = "/dev/ttyUSB0"
+ser.baudrate = 9600
+
+ser.open()
+ser.flushInput()
+
+byte, data = 0, ""
+
+def dump(d, prefix=''):
+    print(prefix + ' '.join(x.encode('hex') for x in d))
+
+def construct_command(cmd, data=[]):
+    assert len(data) <= 12
+    data += [0,]*(12-len(data))
+    checksum = (sum(data)+cmd-2)%256
+    ret = "\xaa\xb4" + chr(cmd)
+    ret += ''.join(chr(x) for x in data)
+    ret += "\xff\xff" + chr(checksum) + "\xab"
+
+    if DEBUG:
+        dump(ret, '> ')
+    return ret
+
+def process_data(d):
+    r = struct.unpack('<HHxxBB', d[2:])
+    pm25 = r[0]/10.0
+    pm10 = r[1]/10.0
+    checksum = sum(ord(v) for v in d[2:8])%256
+    return [pm25, pm10]
+    #print("PM 2.5: {} μg/m^3  PM 10: {} μg/m^3 CRC={}".format(pm25, pm10, "OK" if (checksum==r[2] and r[3]==0xab) else "NOK"))
+
+def process_version(d):
+    r = struct.unpack('<BBBHBB', d[3:])
+    checksum = sum(ord(v) for v in d[2:8])%256
+    print("Y: {}, M: {}, D: {}, ID: {}, CRC={}".format(r[0], r[1], r[2], hex(r[3]), "OK" if (checksum==r[4] and r[5]==0xab) else "NOK"))
+
+def read_response():
+    byte = 0
+    while byte != "\xaa":
+        byte = ser.read(size=1)
+
+    d = ser.read(size=9)
+
+    if DEBUG:
+        dump(d, '< ')
+    return byte + d
+
+def cmd_set_mode(mode=MODE_QUERY):
+    ser.write(construct_command(CMD_MODE, [0x1, mode]))
+    read_response()
+
+def cmd_query_data():
+    ser.write(construct_command(CMD_QUERY_DATA))
+    d = read_response()
+    values = []
+    if d[1] == "\xc0":
+        values = process_data(d)
+    return values
+
+def cmd_set_sleep(sleep=1):
+    mode = 0 if sleep else 1
+    ser.write(construct_command(CMD_SLEEP, [0x1, mode]))
+    read_response()
+
+def cmd_set_working_period(period):
+    ser.write(construct_command(CMD_WORKING_PERIOD, [0x1, period]))
+    read_response()
+
+def cmd_firmware_ver():
+    ser.write(construct_command(CMD_FIRMWARE))
+    d = read_response()
+    process_version(d)
+
+def cmd_set_id(id):
+    id_h = (id>>8) % 256
+    id_l = id % 256
+    ser.write(construct_command(CMD_DEVICE_ID, [0]*10+[id_l, id_h]))
+    read_response()
+
+if __name__ == "__main__":
+    while True:
+        cmd_set_sleep(0)
+        cmd_set_mode(1);
+        for t in range(15):
+            values = cmd_query_data();
+            if values is not None:
+                print("PM2.5: ", values[0], ", PM10: ", values[1])
+                time.sleep(2)
+
+        # open stored data
+        with open('/var/www/html/aqi.json') as json_data:
+            data = json.load(json_data)
+
+        # check if length is more than 100 and delete first element
+        if len(data) > 100:
+            data.pop(0)
+
+        # append new values
+        data.append({'pm25': values[0], 'pm10': values[1], 'time': time.strftime("%d.%m.%Y %H:%M:%S")})
+
+        # save it
+        with open('/var/www/html/aqi.json', 'w') as outfile:
+            json.dump(data, outfile)
+
+        print("Going to sleep for 5min...")
+        cmd_set_mode(0);
+        cmd_set_sleep()
+        time.sleep(300)
+
+#!/usr/bin/python
+# coding=utf-8
+# "DATASHEET": http://cl.ly/ekot
+# https://gist.github.com/kadamski/92653913a53baf9dd1a8
+from __future__ import print_function
+import serial, struct, sys, time, json
+ 
+DEBUG = 0
+CMD_MODE = 2
+CMD_QUERY_DATA = 4
+CMD_DEVICE_ID = 5
+CMD_SLEEP = 6
+CMD_FIRMWARE = 7
+CMD_WORKING_PERIOD = 8
+MODE_ACTIVE = 0
+MODE_QUERY = 1
+ 
+ser = serial.Serial()
+ser.port = "/dev/ttyUSB0"
+ser.baudrate = 9600
+ 
+ser.open()
+ser.flushInput()
+ 
+byte, data = 0, ""
+ 
+def dump(d, prefix=''):
+    print(prefix + ' '.join(x.encode('hex') for x in d))
+ 
+def construct_command(cmd, data=[]):
+    assert len(data) <= 12
+    data += [0,]*(12-len(data))
+    checksum = (sum(data)+cmd-2)%256
+    ret = "\xaa\xb4" + chr(cmd)
+    ret += ''.join(chr(x) for x in data)
+    ret += "\xff\xff" + chr(checksum) + "\xab"
+ 
+    if DEBUG:
+        dump(ret, '> ')
+    return ret
+ 
+def process_data(d):
+    r = struct.unpack('<HHxxBB', d[2:])
+    pm25 = r[0]/10.0
+    pm10 = r[1]/10.0
+    checksum = sum(ord(v) for v in d[2:8])%256
+    return [pm25, pm10]
+    #print("PM 2.5: {} μg/m^3  PM 10: {} μg/m^3 CRC={}".format(pm25, pm10, "OK" if (checksum==r[2] and r[3]==0xab) else "NOK"))
+ 
+def process_version(d):
+    r = struct.unpack('<BBBHBB', d[3:])
+    checksum = sum(ord(v) for v in d[2:8])%256
+    print("Y: {}, M: {}, D: {}, ID: {}, CRC={}".format(r[0], r[1], r[2], hex(r[3]), "OK" if (checksum==r[4] and r[5]==0xab) else "NOK"))
+ 
+def read_response():
+    byte = 0
+    while byte != "\xaa":
+        byte = ser.read(size=1)
+ 
+    d = ser.read(size=9)
+ 
+    if DEBUG:
+        dump(d, '< ')
+    return byte + d
+ 
+def cmd_set_mode(mode=MODE_QUERY):
+    ser.write(construct_command(CMD_MODE, [0x1, mode]))
+    read_response()
+ 
+def cmd_query_data():
+    ser.write(construct_command(CMD_QUERY_DATA))
+    d = read_response()
+    values = []
+    if d[1] == "\xc0":
+        values = process_data(d)
+    return values
+ 
+def cmd_set_sleep(sleep=1):
+    mode = 0 if sleep else 1
+    ser.write(construct_command(CMD_SLEEP, [0x1, mode]))
+    read_response()
+ 
+def cmd_set_working_period(period):
+    ser.write(construct_command(CMD_WORKING_PERIOD, [0x1, period]))
+    read_response()
+ 
+def cmd_firmware_ver():
+    ser.write(construct_command(CMD_FIRMWARE))
+    d = read_response()
+    process_version(d)
+ 
+def cmd_set_id(id):
+    id_h = (id>>8) % 256
+    id_l = id % 256
+    ser.write(construct_command(CMD_DEVICE_ID, [0]*10+[id_l, id_h]))
+    read_response()
+ 
+if __name__ == "__main__":
+    while True:
+        cmd_set_sleep(0)
+        cmd_set_mode(1);
+        for t in range(15):
+            values = cmd_query_data();
+            if values is not None:
+                print("PM2.5: ", values[0], ", PM10: ", values[1])
+                time.sleep(2)
+ 
+        # open stored data
+        with open('/var/www/html/aqi.json') as json_data:
+            data = json.load(json_data)
+ 
+        # check if length is more than 100 and delete first element
+        if len(data) > 100:
+            data.pop(0)
+ 
+        # append new values
+        data.append({'pm25': values[0], 'pm10': values[1], 'time': time.strftime("%d.%m.%Y %H:%M:%S")})
+ 
+        # save it
+        with open('/var/www/html/aqi.json', 'w') as outfile:
+            json.dump(data, outfile)
+ 
+        print("Going to sleep for 5min...")
+        cmd_set_mode(0);
+        cmd_set_sleep()
+        time.sleep(300)
+Schneller geht es mit:
+
+$ wget -O /home/pi/aqi.py https://raw.githubusercontent.com/zefanja/aqi/master/python/aqi.py
+1
+$ wget -O /home/pi/aqi.py https://raw.githubusercontent.com/zefanja/aqi/master/python/aqi.py
+Damit das Skript fehlerfrei durchläuft sind noch zwei kleine Dinge nötig:
+
+$ sudo chown pi:pi /var/www/html/
+$ echo [] > /var/www/html/aqi.json
+1
+2
+$ sudo chown pi:pi /var/www/html/
+$ echo [] > /var/www/html/aqi.json
+Nun kann man das Skript starten:
+
+$ chmod +x aqi.py
+$ ./aqi.py
+PM2.5: 55.3 , PM10: 47.5
+PM2.5: 55.5 , PM10: 47.7
+PM2.5: 55.7 , PM10: 47.8
+PM2.5: 53.9 , PM10: 47.6
+PM2.5: 53.6 , PM10: 47.4
+PM2.5: 54.2 , PM10: 47.3
+...
+$ chmod +x aqi.py
+$ ./aqi.py
+PM2.5: 55.3 , PM10: 47.5
+PM2.5: 55.5 , PM10: 47.7
+PM2.5: 55.7 , PM10: 47.8
+PM2.5: 53.9 , PM10: 47.6
+PM2.5: 53.6 , PM10: 47.4
+PM2.5: 54.2 , PM10: 47.3
+...
+Skript automatisch starten lassen [Update]
+Damit wir nicht jedes mal das Skript von Hand starten müssen, können wir es
+ mit einem Cronjob z.B. bei jedem Neustart des Raspberry Pis mit starten lassen.
+  Dazu öffnen wir die crontab-Datei
+
+$ crontab -e
+1
+$ crontab -e
+und ergänzen am Ende die nachfolgende Zeile:
+
+@reboot cd /home/pi/ && ./aqi.py
+1
+@reboot cd /home/pi/ && ./aqi.py
+Nun startet unser Skript automatisch bei jedem Neustart mit.
+
+HTML-Seite für Anzeige der Messwerte und AQI
+Weiter oben haben wir bereits einen leichtgewichtigen Webserver lighttpd installiert. Unsere HTML-, 
+Javascript- und CSS-Datei müssen wir also im Verzeichnis /var/www/html/ speichern, damit wir von einen 
+anderem Computer / Smartphone auf die Daten zugreifen können. Mit den nächsten drei Befehlen laden wir
+ die entsprechenden Dateien einfach herunter:
+
+$ wget -O /var/www/html/index.html https://raw.githubusercontent.com/zefanja/aqi/master/html/index.html
+$ wget -O /var/www/html/aqi.js https://raw.githubusercontent.com/zefanja/aqi/master/html/aqi.js
+$ wget -O /var/www/html/style.css https://raw.githubusercontent.com/zefanja/aqi/master/html/style.css
+1
+2
+3
+$ wget -O /var/www/html/index.html https://raw.githubusercontent.com/zefanja/aqi/master/html/index.html
+$ wget -O /var/www/html/aqi.js https://raw.githubusercontent.com/zefanja/aqi/master/html/aqi.js
+$ wget -O /var/www/html/style.css https://raw.githubusercontent.com/zefanja/aqi/master/html/style.css
+Die Hauptarbeit findet in der Javascript-Datei statt, die unsere JSON-Datei öffnet, den letzten Wert
+ nimmt und anhand dieses Wertes den AQI berechnet. Dann werden noch die Hintergrundfarben anhand der 
+ Skala der EPA angepasst.
+
+Nun man die Adresse des Raspberry Pis einfach im Browser aufrufen und die 
+aktuellen Feinstaubwerte betrachten, z.B. http://192.168.1.5:
+
+AQI Website
+
+Die Seite ist sehr einfach gestaltet und kann noch erweitert werden, z.B. 
+um eine Grafik, die den Verlauf der letzten Stunden anzeigt usw. Pull 
+Requests sind willkommen 🙂 Der komplette Quellcode befindet sich auf Github.
+
+Fazit
+Für relativ wenig Geld können wir jetzt den Feinstaub mit einem Raspberry 
+Pi messen. Ob draußen fest installiert oder als mobiles Messgerät – Einsatzmöglichkeiten 
+gibt es viele. An unserer Schule haben wir beides im Einsatz. Einerseits einen Sensor 
+der Tag und Nacht die Werte im Freien misst und einen mobilen Sensor, 
+mit dem wir die Effektivität unserer Luftfilter in den Klassenzimmern überprüfen.
+
+So sieht das ganze bei uns in der Schule aus:
+
+AQI Sensor
+
+Unter http://luftdaten.info gibt es noch eine andere Möglichkeit einen 
+ähnlichen Sensor zu bauen. Da bekommt man die Software bereits fertig 
+geliefert und das Messgerät ist noch mal kompakter, da kein Raspberry Pi 
+verwendet wird. Tolles Projekt!
+
+Ein Feinstaubsensor ist ein Projekt, was sich auch gut mit Schülern im 
+Informatikunterricht oder einer Arbeitsgemeinschaft umsetzen lässt
