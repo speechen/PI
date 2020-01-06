@@ -158,4 +158,25 @@
  100  Datum: 6.1.2020  Zeit: 13:12:34  temperatur = 25.0  feuchtigkeit = 35.0 
  101  Datum: 6.1.2020  Zeit: 13:13:35  temperatur = 25.0  feuchtigkeit = 37.0 
  102  Datum: 6.1.2020  Zeit: 13:14:36  temperatur = 25.0  feuchtigkeit = 36.0 
- 103  Datum: 6.1.2020  Zeit: 13:15:36  temperatur = 25.0  feuchtigkeit = 36.0
+ 103  Datum: 6.1.2020  Zeit: 13:15:36  temperatur = 25.0  feuchtigkeit = 36.0 
+ 104  Datum: 6.1.2020  Zeit: 13:16:39  temperatur = 25.0  feuchtigkeit = 36.0 
+ 105  Datum: 6.1.2020  Zeit: 13:17:40  temperatur = 25.0  feuchtigkeit = 31.0 
+ 106  Datum: 6.1.2020  Zeit: 13:18:43  temperatur = 25.0  feuchtigkeit = 35.0 
+ 107  Datum: 6.1.2020  Zeit: 13:19:44  temperatur = 25.0  feuchtigkeit = 31.0 
+ 108  Datum: 6.1.2020  Zeit: 13:20:44  temperatur = 25.0  feuchtigkeit = 35.0 
+ 109  Datum: 6.1.2020  Zeit: 13:21:45  temperatur = 25.0  feuchtigkeit = 35.0 
+ 110  Datum: 6.1.2020  Zeit: 13:22:50  temperatur = 25.0  feuchtigkeit = 30.0 
+ 111  Datum: 6.1.2020  Zeit: 13:23:51  temperatur = 25.0  feuchtigkeit = 30.0 
+ 112  Datum: 6.1.2020  Zeit: 13:24:51  temperatur = 25.0  feuchtigkeit = 35.0 
+ 113  Datum: 6.1.2020  Zeit: 13:25:54  temperatur = 25.0  feuchtigkeit = 35.0 
+ 114  Datum: 6.1.2020  Zeit: 13:26:55  temperatur = 25.0  feuchtigkeit = 30.0 
+ 115  Datum: 6.1.2020  Zeit: 13:27:58  temperatur = 25.0  feuchtigkeit = 35.0 
+ 116  Datum: 6.1.2020  Zeit: 13:29:1  temperatur = 25.0  feuchtigkeit = 35.0 
+ 117  Datum: 6.1.2020  Zeit: 13:30:2  temperatur = 25.0  feuchtigkeit = 30.0 
+ 118  Datum: 6.1.2020  Zeit: 13:31:2  temperatur = 25.0  feuchtigkeit = 35.0 
+ 119  Datum: 6.1.2020  Zeit: 13:32:3  temperatur = 25.0  feuchtigkeit = 35.0 
+ 120  Datum: 6.1.2020  Zeit: 13:33:4  temperatur = 25.0  feuchtigkeit = 35.0 
+ 121  Datum: 6.1.2020  Zeit: 13:34:4  temperatur = 25.0  feuchtigkeit = 35.0 
+ 122  Datum: 6.1.2020  Zeit: 13:35:7  temperatur = 25.0  feuchtigkeit = 35.0 
+ 123  Datum: 6.1.2020  Zeit: 13:36:10  temperatur = 25.0  feuchtigkeit = 35.0 
+ 124  Datum: 6.1.2020  Zeit: 13:37:11  temperatur = 26.0  feuchtigkeit = 31.0
