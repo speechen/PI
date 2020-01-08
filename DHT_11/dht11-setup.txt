@@ -1,0 +1,53 @@
+DHT11 - Luftfeuchtigkeit und Temperatur messen
+Da nicht jeder Mensch mit seinem Raspberry Pi die Temperatur messen möchte, 
+ist die Bibliothek und die benötigte Software leider nicht vorinstalliert. 
+Du musst diese Bibliothek also selber aus dem Internet laden. Wenn dein Pi
+ schon eine Internetverbindung hat, dann mach hier einfach weiter. Wenn dein Pi 
+noch keine Internetverbindung hat, kannst du den Pi einfach über ein Lan-Kabel 
+an den Router ins Netz bringen. Mehr wie immer online!
+
+Bash
+$ sudo apt-get update
+Mit den apt-get Befehlen verwalten wir die Programme, welche auf unserem Computer 
+oder Raspberry Pi installiert sind. Speziell bei diesen Quellen werden die 
+Softwarequellen aktualisiert, damit wir auch immer nur die neusten Programme 
+installieren.
+
+Wenn du den Sensor mit Python2 benutzen möchtest, musst du die folgenden Befehle 
+einfach nur durch python ersetzen (also die 3 weglassen) ;)
+
+Bash
+$ sudo apt-get install build-essential python3-dev
+Hiermit installieren wir jetzt das Programm, das wir brauchen. Was es wirklich kann, 
+zeigt sich gleich.
+
+Und mit folgendem Befehl lädst du dir die Bibliothek herunter:
+
+Bash
+$ git clone
+      https://github.com/coding-world/Python_DHT.git
+
+Das besondere ist dabei, dass die Bibliothek in den Ordner Python_DHT 
+runtergeladen wird und deinem Computer noch nicht bekannt ist. Deswegen müssen wir 
+erst einmal in den Ordner der Bibliothek wechseln.
+
+
+
+Bash
+$ cd Python_DHT
+
+Mit
+
+Bash
+$ sudo python3 setup.py install
+
+installieren wir die Bibliothek auf dem Raspberry Pi und können sie jetzt auch 
+mit import in unserem Programm benutzen. In der nächsten Einheit werden wir dann 
+den Sensor anschließen.
+
+Schließe zunächst, wie immer, alles richtig an den Pi an. Die Vorderseite des DHT11 
+erkennst du an dem Gitter.
+
+
+
+
