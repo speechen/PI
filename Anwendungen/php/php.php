@@ -1,0 +1,47 @@
+
+<?php
+# -------------------------------------------------------------------
+# (c) Charles Imilkowski
+#
+# Funktion: l�dt mit Curl eine andere URL ein
+# -------------------------------------------------------------------
+$url      = http://192.168.178.190
+# $postdata = Die Daten die per $_POST mitgesendet werden sollen,
+#              das Format entspricht einem $_GET String, wie man ihn
+#              an eine URL anf�gen w�rde
+# -------------------------------------------------------------------
+
+    function HomepageLaden($url, $postdata)
+        {
+        $agent = "Meine Browserkennung v1.0 :)";
+        $header[] = "Accept: text/vnd.wap.wml,*.*";
+        $ch = curl_init($url);
+
+        if ($ch)
+            {
+            curl_setopt($ch,    CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch,    CURLOPT_USERAGENT, $agent);
+            curl_setopt($ch,    CURLOPT_HTTPHEADER, $header);
+            curl_setopt($ch,    CURLOPT_FOLLOWLOCATION, 1);
+
+            # mit den n�chsten 2 Zeilen k�nnte man auch Cookies
+            # verwenden und in einem DIR speichern
+            #curl_setopt($ch,    CURLOPT_COOKIEJAR, "cookie.txt");
+            #curl_setopt($ch,    CURLOPT_COOKIEFILE, "cookie.txt");
+
+            if (isset($postdata))
+                {
+                curl_setopt($ch,    CURLOPT_POST, 1);
+                curl_setopt($ch,    CURLOPT_POSTFIELDS, $postdata);
+                }
+
+            $tmp = curl_exec ($ch);
+            curl_close ($ch);
+            }
+        return $tmp;
+        }
+
+    $_url = "http://de.wikipedia.org/wiki/Hauptseite";
+    $_buffer = HomepageLaden($_url, "");
+    echo $_buffer;
+?>
