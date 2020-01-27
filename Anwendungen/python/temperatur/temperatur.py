@@ -27,7 +27,7 @@ GPIO.output(22, GPIO.LOW)
 GPIO.output(27, GPIO.LOW)
 # erstmal alle auf LOW setzen
 
-
+frequenz = 10
 
 while 1:
  tempData = "/sys/class/thermal/thermal_zone0/temp"

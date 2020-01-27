@@ -1,0 +1,1 @@
+sudo mount -t cifs -o credentials=/home/.smbcredentials,vers=1.0,uid=1000,gid=1000 //192.168.178.1/Platte/ /mnt/Platte

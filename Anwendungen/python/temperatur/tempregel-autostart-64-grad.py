@@ -8,13 +8,13 @@ import time
 
 GPIO.setmode(GPIO.BCM)
 
-GPIO.setup(14, GPIO.OUT)
-GPIO.setup(15, GPIO.OUT)
+GPIO.setup(3, GPIO.OUT)
+GPIO.setup(2, GPIO.OUT)
 
 
 
-GPIO.output(14, GPIO.LOW)
-GPIO.output(15, GPIO.LOW)
+GPIO.output(3, GPIO.LOW)
+GPIO.output(2, GPIO.LOW)
 
 
 
@@ -27,22 +27,21 @@ while 1:
  print("Deine CPU hat " + temperatur + " Grad")
 
  kalt = 40
- warm = 43
- heiss = 44
+ warm = 49
+ heiss = 50
 
  temperatur = int(temperatur)
 
 
-
  if temperatur > warm:
      print ("LUEFTER Aus")
-     GPIO.output(14, GPIO.LOW)
-     GPIO.output(15, GPIO.LOW)
+     GPIO.output(3, GPIO.LOW)
+     GPIO.output(2, GPIO.HIGH)
  if temperatur > heiss:
      print ("SCHNELL Lüfter!")
 
-     GPIO.output(14, GPIO.HIGH)
-     GPIO.output(15, GPIO.HIGH)
+     GPIO.output(3, GPIO.HIGH)
+     GPIO.output(2, GPIO.LOW)
  time.sleep(2)
 
 GPIO.cleanup(all)
